@@ -1,6 +1,6 @@
 from Enviroment import Game
 
-sit = Game()
+game = Game()
 
 class AI_Play:
     def __init__(self):

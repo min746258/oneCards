@@ -22,24 +22,29 @@ class Game:
         #self.all_cards = deque(self.card_list)
         self.deck_cards = deque()
         self.attack = 0
-        self.top_card = ''
+        self.top_card = list()
 
-    def giveCards(self):
+    def startGame(self):
         np.random.shuffle(self.card_list)
+        self.top_card = self.card_list.pop()
         self.deck_cards = deque(self.card_list)
 
-    def ableToStart(self):
-        if len(self.card_list) == 39:
-            return True
+    def giveCards(self, n):
+        np.random.shuffle(self.card_list)
+        cards = list()
+        for i in range(n):
+            cards.append(self.card_list.pop())
+        return cards
+
+    def getAction(self, my_cards):
+        able = list()
+        for i in range(len(my_cards)):
+            if my_cards[i][0] == self.top_card[0] or my_cards[i][1] == self.top_card[1] or my_cards[i][0] == 'J':
+                able.append(my_cards[i])
+        if able:
+            return able
         else:
             return False
 
-    def topCard(self):
-        return self.deck_cards[-1]
-
-    def play(self, player):         #플레이어 번호로 구분
-        if player == 1:
-
-        elif player == 2:
-
-        else:
+    def play(self, action):
+        pass
