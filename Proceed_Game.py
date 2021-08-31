@@ -21,7 +21,11 @@ draw = 0
 
 if auto:
     for j in range(games):
-        env = Game()
+        game = Game()
+        game.startGame()
+        P1.hands_card = game.giveCards(5)
+        P2.hands_card = game.giveCards(5)
+        P3.hands_card = game.giveCards(5)
         for i in range(10000):
             #reward, done =
             if done == True:
@@ -37,8 +41,8 @@ if auto:
     answer = input("More Game? (Y/N)")
 else:
     while True:
-        env = Enviroment()
-        env.print = True
+        game = Game()
+        game.print = True
         for i in range(10000):
             #reward, done =
             if done == True:
