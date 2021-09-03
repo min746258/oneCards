@@ -19,12 +19,18 @@ class Game:
             ['H', '6'], ['H', '7'], ['H', '8'], ['H', '9'], ['H', '10'],
             ['H', 'J'], ['H', 'Q'], ['H', 'K'],
             ['J', 'B'], ['J', 'C']]
-        #self.all_cards = deque(self.card_list)
-        self.deck_cards = deque()
+        self.cards = deque()
         self.attack = 0
-        self.top_card = list()
+        self.top_card = ''
+        self.turn = 1
+        self.state = [self.turn, self.top_card, self.attack]
+        self.state_size = len(self.state)
+        self.actions = list()
+        self.action_size = len(self.actions)
+        self.rewards = list()
 
-    def startGame(self):
+    def resetGame(self):
+        self.cards = deque(self.card_list)
         np.random.shuffle(self.card_list)
         self.top_card = self.card_list.pop()
         self.deck_cards = deque(self.card_list)

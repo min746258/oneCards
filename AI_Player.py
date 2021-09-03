@@ -10,8 +10,8 @@ class DQN_Player:
         self.name = 'DQN Player'
         self.env = Game()                       # 환경을 호출
 
-        #self.state_size =
-        #self.action_size =
+        self.state_size = self.env.state_size
+        self.action_size = self.env.action_size
 
         self.node_num = 12                      # 인공신경망 레이어에 들어 있는 노드 개수
         self.learning_rate = 0.0005             # 학습 속도(느릴수록 정확도는 증가하지만 시간 오래 걸린다)
@@ -31,15 +31,12 @@ class DQN_Player:
         self.epsilon_decay = 0.45               # 에피소드의 45% 진행했을 때 엡실론 = 0
         self.epsilon_min = 0.02                 # 엡실론 최솟값
 
-        # self.moving_avg_size = 20
         self.reward_list = list()               # 에피소드에서 받은 보상의 합 저장
-        # self.count_list = list()
-        # self.moving_avg_list = list()
 
-    def build_modes(self):
+    def build_model(self):                      # 인공신경망 구성하는 함수
         input_states = Input(shape=(1, self.state_size), name='Input_states')               # 인공신경망의 입력층 설정(shape이 1차원 벡터)
         x = (input_states)
-        x = Dense(self.node_num, activation='relu')                                         # 인공신경망의 레이어 설정
+        x = Dense(self.node_num, activation='relu')(x)                                      # 인공신경망의 레이어 설정
         out_actions = Dense(self.action_size, activation='linear', name='output')           # 인공신경망의 출력층 설정
 
         model = tf.keras.models.Model(inputs=[input_states], outputs=[out_actions])         # 모델 구성
@@ -48,9 +45,9 @@ class DQN_Player:
         print(model.summary())
         return model
 
-    def train(self):
+    def train(self):                            # 데이터 수집하고 모델 훈련하는 함수
         for episode in range(self.episode_num):
-            # state = self.env.                                                             # 환경 정보를 받아옴
+            state = self.env.resetGame()                          # 환경 정보를 받아옴
 
             Q, reward_tot = self.action_N_memory(episode, state)                            # 큐함수와 보상 정보를 받아옴
 
@@ -70,7 +67,7 @@ class DQN_Player:
             action = self.greed_search(epsilon, episode, Q)                                 # 큐함수를 토대로 행동 선택
             # state_next, reward, done, none = self.env.step()                              # 다음 상황 대한 정보 받아옴
 
-            if done:
+            # if done:
                 # reward = self.penalty
 
             self.replay_memory.append([state_t, action, reward, state_next, done])          # 리플레이 메모리 업데이트
