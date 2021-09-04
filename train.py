@@ -21,3 +21,4 @@ for i in range(max_learn):
 
         if env.done == 0:
             if env.reward == 0:
+                pass
