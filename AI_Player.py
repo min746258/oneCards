@@ -33,6 +33,8 @@ class DQN_Player:
 
         self.reward_list = list()               # 에피소드에서 받은 보상의 합 저장
 
+        self.cards = list()
+
     def build_model(self):                      # 인공신경망 구성하는 함수
         input_states = Input(shape=(1, self.state_size), name='Input_states')               # 인공신경망의 입력층 설정(shape이 1차원 벡터)
         x = (input_states)
@@ -77,6 +79,10 @@ class DQN_Player:
             reward_tot += reward
             state = state_next
         return Q, reward_tot
+
+    def select_action(self, env):
+        action = self.policy(env)
+        return action
 
     def train_miniBatch(self):                                                              # 리플레이 메모리에서 랜덤하게 데이터 선별해 학습시킴
         array_state = list()
