@@ -1,31 +1,19 @@
 from Enviroment import Game
-from Human_Player import Human_Play
-from AI_Player import DQN_Player
+from DDQN_Player import *
 
-# P1 = human()
-P1 = DQN_Player()
-P2 = DQN_Player()
-P3 = DQN_Player()
-
-games = 250
-print('P1 player : {}'.format(P1.name))
-print('P2 player : {}'.format(P2.name))
-print('P3 player : {}'.format(P3.name))
+# P1 = human
+# P2 = ?
+P3 = Agent()
 
 startingCards_num = 5
 
-P1_win = 0
-P2_win = 0
-P3_win = 0
-draw = 0
-
 env = Game()
-
-# P1은 무조건 Human, P3은 무조건 AI
 env.resetGame()
-P1.cards = env.giveCards(startingCards_num)
-P2.cards = env.giveCards(startingCards_num)
-P3.cards = env.giveCards(startingCards_num)
+
+P1_cards = env.giveCards(startingCards_num)
+
+P2_cards = env.giveCards(startingCards_num)
+P3_cards = env.giveCards(startingCards_num)
 done = False
 winner = False
 
@@ -54,8 +42,7 @@ for t in range(300):
     elif turn == 2:
         pass
     elif turn == 3:
-        # epsilon = P3.get_epsilon(game + 1)
-        # action = P3.greed_search(epsilon, game, Q)
+        action =
         result = env.play(action)
         if result:
             add = env.giveCards(result)

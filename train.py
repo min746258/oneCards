@@ -1,5 +1,4 @@
 from Enviroment import Game
-from Human_Player import Human_Play
 from DDQN_Player import *
 from tqdm import tqdm
 
@@ -40,13 +39,13 @@ if __name__ == '__main__':
             next_state, reward, done, info = env.step(action)
             next_state = np.reshape(next_state, [(1, state_size)])
 
-            agent.append_sample(state, action, reward, next_state, done)
+
             if len(agent.memory) >= agent.train_start:
                 agent.train_model()
 
             state = next_state
 
-            result = env.play(action)
+            # result = env.play(action)
             if result:
                 if env.cards:
                     add = env.giveCards(result)
@@ -58,6 +57,8 @@ if __name__ == '__main__':
                 P1_win += 1
                 winner = 1
                 done = True
+
+            agent.append_sample(state, action, reward, next_state, done)
 
             if done:
                 agent.update_target_model()
