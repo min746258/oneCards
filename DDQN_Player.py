@@ -26,7 +26,7 @@ class DQN(tf.keras.Model):              # 모델 정의
 
 class Agent:
     def __init__(self, state_size, action_size):
-        self.render = True
+        #self.render = True
         self.state_size = state_size
         self.action_size = action_size
 
@@ -35,8 +35,8 @@ class Agent:
         self.epsilon = 1.0
         self.epsilon_decay = 0.60                       # 에피소드의 45% 진행했을 때 엡실론 0 되도록 함
         self.epsilon_min = 0.05
-        self.batch_size =
-        self.train_size =
+        self.batch_size = 64
+        self.train_start = 1000
         self.memory = deque(maxlen=2000)
 
         self.model = DQN(action_size)

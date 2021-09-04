@@ -29,7 +29,7 @@ P3.cards = env.giveCards(startingCards_num)
 done = False
 winner = False
 
-for t in range(10000):
+for t in range(300):
     turn, direction = env.state()
     action = False
 

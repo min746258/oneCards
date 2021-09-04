@@ -1,84 +1,68 @@
 from Enviroment import Game
 from Human_Player import Human_Play
-from AI_Player import DQN_Player
+from DDQN_Player import *
 from tqdm import tqdm
 
-# P1 = human()
-P1 = DQN_Player()
-P2 = DQN_Player()
-P3 = DQN_Player()
+if __name__ == '__main__':
+    env = Game()
+    state_size = env.state_size
+    action_size = env.action_size
 
-auto = True
+    agent = Agent(state_size, action_size)
 
-games = 250
-print('P1 player : {}'.format(P1.name))
-print('P2 player : {}'.format(P2.name))
-print('P3 player : {}'.format(P3.name))
+    scores, episodes = list(), list()
+    score_avg = 0
 
-startingCards_num = 5
+    episode_num = 600
 
-P1_win = 0
-P2_win = 0
-P3_win = 0
-draw = 0
+    startingCards_num = 5
 
-env = Game()
+    P1_win = 0
+    P2_win = 0
+    P3_win = 0
+    draw = 0
 
-for game in tqdm(range(games)):                     # game = episode
-    env.resetGame()
+    for game in tqdm(range(episode_num)):
+        env.resetGame()
+        P1_cards = env.giveCards(startingCards_num)
+        P2_cards = env.giveCards(startingCards_num)
+        P3_cards = env.giveCards(startingCards_num)
+        players_cards = [P2_cards, P3_cards, P1_cards]
 
-    P1.cards = env.giveCards(startingCards_num)
-    P2.cards = env.giveCards(startingCards_num)
-    P3.cards = env.giveCards(startingCards_num)
+        done = False
+        winner = False
 
-    done = False
-    winner = False
+        for t in range(300):
+            turn, direction = env.find_turn()
+            state = env.top_card
 
-    for t in range(10000):
-        turn, direction = env.state()
-        if turn == 1:
-            epsilon = P1.get_epsilon(game+1)
-            action = P1.greed_search(epsilon, game, Q)
+            action = agent.get_action(state)
+            next_state, reward, done, info = env.step(action)
+            next_state = np.reshape(next_state, [(1, state_size)])
+
+            agent.append_sample(state, action, reward, next_state, done)
+            if len(agent.memory) >= agent.train_start:
+                agent.train_model()
+
+            state = next_state
+
             result = env.play(action)
             if result:
-                add = env.giveCards(result)
-                P1.cards.append(add)
-            if not P1.cards:
+                if env.cards:
+                    add = env.giveCards(result)
+                    P1_cards.append(add)
+                else:
+                    draw += 1
+                    break
+            if not P1_cards:
                 P1_win += 1
                 winner = 1
                 done = True
-        elif turn == 2:
-            epsilon = P2.get_epsilon(game + 1)
-            action = P2.greed_search(epsilon, game, Q)
-            result = env.play(action)
-            if result:
-                add = env.giveCards(result)
-                P2.cards.append(add)
-            if not P2.cards:
-                P2_win += 1
-                winner = 2
-                done = True
-        elif turn == 3:
-            epsilon = P3.get_epsilon(game + 1)
-            action = P3.greed_search(epsilon, game, Q)
-            result = env.play(action)
-            if result:
-                add = env.giveCards(result)
-                P3.cards.append(add)
-            if not P3.cards:
-                P3_win += 1
-                winner = 3
-                done = True
 
-        if done:
-            if winner == 1:
-                print('winner is P1({})'.format(P1.name))
-            elif winner == 2:
-                print('winner is P2({})'.format(P2.name))
-            elif winner == 3:
-                print('winner is P3({})'.format(P3.name))
-            else:
-                print('draw')
-            break
+            if done:
+                agent.update_target_model()
+                break
 
-print('P1 win : {} / P2 win : {} / P3 win : {} / draw : {}'.format(P1_win, P2_win, P3_win, draw))
+    print('P1 win : {0:0.2f}% | P2 win : {0:0.2f}% | P3 win : {0:0.2f}% | draw :  {0:0.2f}%'
+          .format(P1_win/episode_num*100, P2_win/episode_num*100, P3_win/episode_num*100, draw/episode_num*100))
+    agent.model.save_weights(".save_model/model", save_format="tf")

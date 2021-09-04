@@ -39,16 +39,18 @@ class Game:
         self.deck_cards = deque(self.card_list)
 
     def giveCards(self, n):         # 카드 지급
+        if not self.cards:
+            return False
         np.random.shuffle(self.cards)
         cards = list()
         for i in range(n):
             cards.append(self.card_list.pop())
         return cards
 
-    def state(self):
+    def find_turn(self):
         return self.turn % 3, self.direction
 
-    def getAction(self, my_cards):  # 가능한 행동 파악
+    def action_able(self, my_cards):  # 가능한 행동 파악
         able = list()
         for i in range(len(my_cards)):
             if my_cards[i][0] == self.top_card[0] or my_cards[i][1] == self.top_card[1] or my_cards[i][0] == 'J':
@@ -58,7 +60,7 @@ class Game:
         else:
             return False
 
-    def play(self, action):         # 행동 반영(구현완료)
+    def step(self, action):         # 행동 반영
         if action:
             self.cards.append(self.top_card)
             self.top_card = action
