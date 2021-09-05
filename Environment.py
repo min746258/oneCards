@@ -53,11 +53,44 @@ class Game:
         return self.turn % 3, self.direction
 
     def action_able(self, my_cards):  # 가능한 행동 파악
-        able = self.action_able()
+        print(self.top_card)
+        able = self.actions
         if self.attack:
             for i in range(len(my_cards)):
+                if self.top_card[0] == 'J':
+                    if my_cards[i][0] == 'J':
+                        able[8] = 1
+                    elif my_cards[i][1] == '3':
+                        able[5] = 1
 
-
+                elif self.top_card[1] == '2':
+                    if my_cards[i][1] == '2':
+                        able[6] = 1
+                    elif my_cards[i][1] == 'A':
+                        able[7] = 1
+                    elif my_cards[i][1] == 'J':
+                        able[8] = 1
+                elif self.top_card[1] == 'A':
+                    if my_cards[i][1] == 'A':
+                        able[7] = 1
+                    elif my_cards[i][0] == 'J':
+                        able[8] = 1
+        else:
+            for i in range(len(my_cards)):
+                if self.top_card[0] == my_cards[i][0]:
+                    able[0] = 1
+                elif self.top_card[1] == my_cards[i][1]:
+                    if my_cards[i][1] == 'J':
+                        able[2] = 1
+                    elif my_cards[i][1] == 'Q':
+                        able[3] = 1
+                    elif my_cards[i][1] == 'K':
+                        able[4] = 1
+                    else:
+                        able[1] = 1
+        if able == [0 for _ in range(9)]:
+            return False
+        return able
 
     def step(self, action):         # 행동 반영
         self.cards.append(self.top_card)

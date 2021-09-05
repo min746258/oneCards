@@ -39,12 +39,12 @@ class Agent:
 
         self.model = DQN(action_size)
         self.target_model = DQN(action_size)
-        self.optimizer = Adam(lr = self.learning_rate)
+        self.optimizer = Adam(lr=self.learning_rate)
 
         self.update_target_model()
 
     def update_target_model(self):                       # 타겟 모델 업데이트
-        self.update_target_model.set_weights(self.model.get_weights())
+        self.target_model.set_weights(self.model.get_weights())
 
     def get_action(self, state):                         # 엡실론-탐욕 함수 기반으로 행동 선택
         if np.random.rand() <= self.epsilon:

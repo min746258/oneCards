@@ -43,10 +43,59 @@ for t in range(300):
     elif turn == 3:
         state = env.action_able(P3_cards)
         action = P3.get_action(state)
-        result = env.step(action)
-        if result:
-            # add = env.giveCards(result)
-            P3_cards.append(add)
+        able = list()
+        if action:
+            if action == 0:
+                for i in range(len(P3_cards)):
+                    if P3_cards[i][0] == env.top_card[0]:
+                        able.append(P3_cards[i])
+            elif action == 1:
+                for i in range(len(P3_cards)):
+                    if P3_cards[i][1] == env.top_card[1]:
+                        able.append(P3_cards[i])
+            elif action == 2:
+                for i in range(len(P3_cards)):
+                    if P3_cards[i][1] == 'J':
+                        able.append(P3_cards[i])
+                env.turn += env.direction * 2
+            elif action == 3:
+                for i in range(len(P3_cards)):
+                    if P3_cards[i][1] == 'Q':
+                        able.append(P3_cards[i])
+                env.direction *= -1
+            elif action == 4:
+                for i in range(len(P3_cards)):
+                    if P3_cards[i][1] == 'K':
+                        able.append(P3_cards[i])
+                env.turn += 3
+            elif action == 5:
+                for i in range(len(P3_cards)):
+                    if P3_cards[i][1] == '3':
+                        able.append(P3_cards[i])
+                env.attack = 0
+            elif action == 6:
+                for i in range(len(P3_cards)):
+                    if P3_cards[i][1] == '2':
+                        able.append(P3_cards[i])
+                env.attack += 2
+            elif action == 7:
+                for i in range(len(P3_cards)):
+                    if P3_cards[i][1] == 'A':
+                        able.append(P3_cards[i])
+                env.attack += 3
+            elif action == 8:
+                for i in range(len(P3_cards)):
+                    if P3_cards[i][0] == 'J':
+                        able.append(P3_cards[i])
+                env.attack += 5
+            final_action = random.sample(able)
+            env.step(final_action)
+        else:
+            if env.attack:
+                P3_cards += env.giveCards(env.attack)
+                env.attack = 0
+            else:
+                P3_cards.append(env.giveCards(1)[0])
         if not P3.cards:
             winner = 3
             done = True
@@ -61,3 +110,5 @@ for t in range(300):
         else:
             print('draw')
         break
+
+    env.turn += env.direction
