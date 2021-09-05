@@ -35,8 +35,17 @@ if __name__ == '__main__':
         P3_reward = 0
 
         for t in range(300):
+            print('\n\n', env.turn)
+            print('P1 : ', P1_cards)
+            print('P2 : ', P2_cards)
+            print('P3 : ', P3_cards)
+            print('top card : ', env.top_card)
+            print('attack : ', env.attack)
+
             if env.turn % 3 == 1:           # P1
+                print('\nP1 turn')
                 state = env.action_able(P1_cards)
+                print('P1 state : ', state)
                 if not state:
                     if env.attack:
                         P1_cards += env.giveCards(env.attack)
@@ -47,8 +56,14 @@ if __name__ == '__main__':
                         P1_cards.append(env.giveCards(1)[0])
                         P2_reward += 1
                         P3_reward += 1
+                    env.turn += env.direction
                     continue
-                action = agent.get_action(state)
+                while True:
+                    action = agent.get_action(state)
+                    if state[action] == 1:
+                        break
+
+                print('P1 action : ', action)
                 able = list()
                 if action == 0:
                     for i in range(len(P1_cards)):
@@ -74,6 +89,7 @@ if __name__ == '__main__':
                         if P1_cards[i][1] == 'K':
                             able.append(P1_cards[i])
                     P1_reward += 2
+                    print('K')
                     env.turn += 3
                 elif action == 5:
                     for i in range(len(P1_cards)):
@@ -95,8 +111,15 @@ if __name__ == '__main__':
                         if P1_cards[i][0] == 'J':
                             able.append(P1_cards[i])
                     env.attack += 5
-                final_action = random.sample(able, 1)
+                print('P1 able : ', able)
+                if len(able) > 1:
+                    final_action = random.sample(able, 1)[0]
+                else:
+                    final_action = able[0]
+
+                print('1 final action : ', final_action)
                 env.step(final_action)
+                P1_cards.remove(final_action)
                 if next_state:
                     agent.append_sample(state, action, P1_reward, next_state, done)
                 P1_reward = 0
@@ -110,7 +133,9 @@ if __name__ == '__main__':
                     break
 
             elif env.turn % 3 == 2:             # P2
+                print('\nP2 turn')
                 state = env.action_able(P2_cards)
+                print('P2 state : ', state)
                 if not state:
                     if env.attack:
                         P2_cards += env.giveCards(env.attack)
@@ -121,8 +146,14 @@ if __name__ == '__main__':
                         P2_cards.append(env.giveCards(1)[0])
                         P1_reward += 1
                         P3_reward += 1
+                    env.turn += env.direction
                     continue
-                action = agent.get_action(state)
+                while True:
+                    action = agent.get_action(state)
+                    if state[action] == 1:
+                        break
+
+                print('P2 action : ', action)
                 able = list()
 
                 if action == 0:
@@ -170,7 +201,13 @@ if __name__ == '__main__':
                         if P2_cards[i][0] == 'J':
                             able.append(P2_cards[i])
                     env.attack += 5
-                final_action = random.sample(able)
+                print('P2 able : ', able)
+                if len(able) > 1:
+                    final_action = random.sample(able, 1)[0]
+                else:
+                    final_action = able[0]
+                P2_cards.remove(final_action)
+                print('P2 final action : ', final_action)
                 env.step(final_action)
                 if next_state:
                     agent.append_sample(state, action, P2_reward, next_state, done)
@@ -183,7 +220,9 @@ if __name__ == '__main__':
                     P2_win += 1
                     agent.append_sample(state, action, 100, next_state, done)
             else:           # P3
+                print('\nP3 turn')
                 state = env.action_able(P3_cards)
+                print('P3 state : ', state)
                 if not state:
                     if env.attack:
                         P3_cards += env.giveCards(env.attack)
@@ -194,8 +233,13 @@ if __name__ == '__main__':
                         P3_cards.append(env.giveCards(1)[0])
                         P1_reward += 1
                         P2_reward += 1
+                    env.turn += env.direction
                     continue
-                action = agent.get_action(state)
+                while True:
+                    action = agent.get_action(state)
+                    if state[action] == 1:
+                        break
+                print('P3 action : ', action)
                 able = list()
 
                 if action == 0:
@@ -211,7 +255,7 @@ if __name__ == '__main__':
                         if P3_cards[i][1] == 'J':
                             able.append(P3_cards[i])
                     P3_reward += 1
-                    env.turn += env.direction * 2
+                    env.turn += env.direction
                 elif action == 3:
                     for i in range(len(P3_cards)):
                         if P3_cards[i][1] == 'Q':
@@ -222,7 +266,7 @@ if __name__ == '__main__':
                         if P3_cards[i][1] == 'K':
                             able.append(P3_cards[i])
                     P3_reward += 2
-                    env.turn += 3
+                    env.turn += 2
                 elif action == 5:
                     for i in range(len(P3_cards)):
                         if P3_cards[i][1] == '3':
@@ -243,7 +287,13 @@ if __name__ == '__main__':
                         if P3_cards[i][0] == 'J':
                             able.append(P3_cards[i])
                     env.attack += 5
-                final_action = random.sample(able)
+                print('P3 able : ', able)
+                if len(able) > 1:
+                    final_action = random.sample(able, 1)[0]
+                else:
+                    final_action = able[0]
+                P3_cards.remove(final_action)
+                print('P3 final action : ', final_action)
                 env.step(final_action)
                 if next_state:
                     agent.append_sample(state, action, P3_reward, next_state, done)

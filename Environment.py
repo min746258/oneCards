@@ -35,6 +35,9 @@ class Game:
         self.done = False
 
     def resetGame(self):            # 게임 리셋
+        self.attack = 0
+        self.turn = 1000
+        self.direction = 1
         self.cards = deque(self.card_list)
         np.random.shuffle(self.card_list)
         self.top_card = self.card_list.pop()
@@ -53,8 +56,7 @@ class Game:
         return self.turn % 3, self.direction
 
     def action_able(self, my_cards):  # 가능한 행동 파악
-        print(self.top_card)
-        able = self.actions
+        able = [0 for _ in range(9)]
         if self.attack:
             for i in range(len(my_cards)):
                 if self.top_card[0] == 'J':
@@ -77,6 +79,8 @@ class Game:
                         able[8] = 1
         else:
             for i in range(len(my_cards)):
+                #if self.top_card[0] == 'J':
+                 #   if my_cards[i][0]
                 if self.top_card[0] == my_cards[i][0]:
                     able[0] = 1
                 elif self.top_card[1] == my_cards[i][1]:
