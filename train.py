@@ -3,6 +3,7 @@ from DQN_Player import *
 from tqdm import tqdm
 
 if __name__ == '__main__':
+    print('starting to learn')
     env = Game()
     state_size = env.state_size
     action_size = env.action_size
@@ -14,7 +15,7 @@ if __name__ == '__main__':
 
     episode_num = 600
 
-    startingCards_num = 5
+    startingCards_num = int(input())  # 5 입력하면 됨
 
     P1_win = 0
     P2_win = 0
@@ -89,8 +90,8 @@ if __name__ == '__main__':
                         if P1_cards[i][1] == 'K':
                             able.append(P1_cards[i])
                     P1_reward += 2
-                    print('K')
-                    env.turn += 3
+                    #print('K')
+                    env.turn += 2
                 elif action == 5:
                     for i in range(len(P1_cards)):
                         if P1_cards[i][1] == '3':
@@ -180,7 +181,7 @@ if __name__ == '__main__':
                         if P2_cards[i][1] == 'K':
                             able.append(P2_cards[i])
                     P2_reward += 2
-                    env.turn += 3
+                    env.turn += 2
                 elif action == 5:
                     for i in range(len(P2_cards)):
                         if P2_cards[i][1] == '3':

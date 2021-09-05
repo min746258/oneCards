@@ -64,7 +64,10 @@ class Game:
                         able[8] = 1
                     elif my_cards[i][1] == '3':
                         able[5] = 1
-
+                    '''if my_cards[i][1] == '2':
+                        able[6] = 1
+                    if my_cards[i][1] == 'A':
+                        able[7] = 1'''
                 elif self.top_card[1] == '2':
                     if my_cards[i][1] == '2':
                         able[6] = 1
