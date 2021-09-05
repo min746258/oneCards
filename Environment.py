@@ -3,6 +3,7 @@ import numpy as np
 
 # 플레이어 3명, 카드 5장으로 시작함
 
+
 class Game:
     def __init__(self):
         self.card_list = [          #Diamond, Spade, Clover, Heart, Joker
@@ -20,23 +21,24 @@ class Game:
             ['H', 'J'], ['H', 'Q'], ['H', 'K'],
             ['J', 'SC'], ['J', 'HD']]
         self.cards = deque()
+        self.attack_card = ['2', 'A', 'J']
         self.attack = 0
         self.top_card = ''
-        self.turn = 1
+        self.turn = 1000
         self.direction = 1
+        self.state = [0 for _ in range(9)]
         self.state_size = len(self.state)
-        self.actions = list()
+        self.actions = self.state
         self.action_size = len(self.actions)
         self.reward = 0
         self.rewards = list()
         self.done = False
-        self.state = [self.turn, self.top_card, self.attack, self.done]
 
     def resetGame(self):            # 게임 리셋
         self.cards = deque(self.card_list)
         np.random.shuffle(self.card_list)
         self.top_card = self.card_list.pop()
-        self.deck_cards = deque(self.card_list)
+        self.cards = deque(self.card_list)
 
     def giveCards(self, n):         # 카드 지급
         if not self.cards:
@@ -47,27 +49,16 @@ class Game:
             cards.append(self.card_list.pop())
         return cards
 
-    def find_turn(self):
+    def find_turn(self):            # 플레이어 순서, 방향 파악
         return self.turn % 3, self.direction
 
     def action_able(self, my_cards):  # 가능한 행동 파악
-        able = list()
-        for i in range(len(my_cards)):
-            if my_cards[i][0] == self.top_card[0] or my_cards[i][1] == self.top_card[1] or my_cards[i][0] == 'J':
-                able.append(my_cards[i])
-        if able:
-            return able
-        else:
-            return False
+        able = self.action_able()
+        if self.attack:
+            for i in range(len(my_cards)):
+
+
 
     def step(self, action):         # 행동 반영
-        if action:
-            self.cards.append(self.top_card)
-            self.top_card = action
-            return False
-        else:
-            if self.attack:
-                return self.attack
-            else:
-                return 1
-
+        self.cards.append(self.top_card)
+        self.top_card = action

@@ -11,10 +11,8 @@ from tensorflow.keras.initializers import RandomUniform
 class DQN(tf.keras.Model):              # 모델 정의
     def __init__(self, action_size):
         super(DQN, self).__init__()
-        self.fc1 = Dense(54, activation='relu')                                                 # 입력층?
-        self.fc2 = Dense(54, activation='relu')                                                 # 은닉층1
-        self.fc3 = Dense(54, activation='relu')                                                 # 은닉층2
-        self.fc4 = Dense(54, activation='relu')                                                 # 은닉층3
+        self.fc1 = Dense(9, activation='relu')                                                  # 입력층?
+        self.fc2 = Dense(9, activation='relu')                                                  # 은닉층1
         self.fc_out = Dense(action_size, kernel_initializer=RandomUniform(-1e-3, 1e-3))         # 출력층(가중치 초기화)
 
     def call(self, x):                  # 큐함수 반환?
@@ -45,10 +43,10 @@ class Agent:
 
         self.update_target_model()
 
-    def update_target_model(self):                                                      # 타겟 모델 업데이트
+    def update_target_model(self):                       # 타겟 모델 업데이트
         self.update_target_model.set_weights(self.model.get_weights())
 
-    def get_action(self, state):                                                        # 엡실론-탐욕 함수 기반으로 행동 선택
+    def get_action(self, state):                         # 엡실론-탐욕 함수 기반으로 행동 선택
         if np.random.rand() <= self.epsilon:
             return random.randrange(self.action_size)
         else:
@@ -58,7 +56,7 @@ class Agent:
     def append_sample(self, state, action, reward, next_state, done):                   # 리플레이 메모리 업데이트
         self.memory.append((state, action, reward, next_state, done))
 
-    def train_model(self):                                                              # 모델 훈련
+    def train_model(self):                              # 모델 훈련
         if self.epsilon > self.epsilon_min:                                             # 엡실론 값 업데이트
             self.epsilon *= self.epsilon_decay
 

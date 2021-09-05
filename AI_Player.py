@@ -3,7 +3,7 @@ from tensorflow.keras.layers import Input, Dense
 from tensorflow.keras.optimizers import Adam
 import numpy as np
 import random as rand
-from Enviroment import Game
+from Environment import Game
 
 class DQN_Player:
     def __init__(self):
