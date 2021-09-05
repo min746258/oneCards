@@ -18,7 +18,6 @@ class DQN(tf.keras.Model):              # 모델 정의
     def call(self, x):                  # 큐함수 반환?
         x = self.fc1(x)
         x = self.fc2(x)
-        x = self.fc3(x)
         q = self.fc_out(x)
         return q
 
@@ -33,8 +32,8 @@ class Agent:
         self.epsilon = 1.0
         self.epsilon_decay = 0.60                       # 에피소드의 45% 진행했을 때 엡실론 0 되도록 함
         self.epsilon_min = 0.05
-        self.batch_size = 64
-        self.train_start = 1000
+        self.batch_size = 60
+        self.train_start = 1200
         self.memory = deque(maxlen=2000)
 
         self.model = DQN(action_size)
@@ -47,6 +46,7 @@ class Agent:
         self.target_model.set_weights(self.model.get_weights())
 
     def get_action(self, state):                         # 엡실론-탐욕 함수 기반으로 행동 선택
+        state = np.reshape(state, [1, self.state_size])
         if np.random.rand() <= self.epsilon:
             return random.randrange(self.action_size)
         else:
@@ -61,12 +61,17 @@ class Agent:
             self.epsilon *= self.epsilon_decay
 
         mini_batch = random.sample(self.memory, self.batch_size)                        # 미니배치 가져온다
-
-        states = np.array([sample[0][0] for sample in mini_batch])
+        # print(len(mini_batch))
+        # print('mini_batch : ', mini_batch)
+        states = np.array([sample[0] for sample in mini_batch])
+        # print(states)
         actions = np.array([sample[1] for sample in mini_batch])
-        rewards = np.array([sample[3][0] for sample in mini_batch])
-        next_states = np.array([sample[4] for sample in mini_batch])
-        dones = np.array([sample[5] for sample in mini_batch])
+        # print(actions)
+        rewards = np.array([sample[2] for sample in mini_batch])
+        # print(rewards)
+        next_states = np.array([sample[3] for sample in mini_batch])
+        # print(next_states)
+        dones = np.array([sample[4] for sample in mini_batch])
 
         model_params = self.model.trainable_variables
         with tf.GradientTape() as tape:

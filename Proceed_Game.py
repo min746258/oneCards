@@ -4,12 +4,13 @@ from DQN_Player import *
 # P1 = human
 # P2 = ?
 # P3 = AI
-P3 = Agent()
 
 startingCards_num = 5
 
 env = Game()
 env.resetGame()
+
+P3 = Agent(env.state_size, env.action_size)
 
 P1_cards = env.giveCards(startingCards_num)
 P2_cards = env.giveCards(startingCards_num)

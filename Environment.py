@@ -3,7 +3,6 @@ import numpy as np
 
 # 플레이어 3명, 카드 5장으로 시작함
 
-
 class Game:
     def __init__(self):
         self.card_list = [          #Diamond, Spade, Clover, Heart, Joker
@@ -19,9 +18,9 @@ class Game:
             ['H', 'A'], ['H', '2'], ['H', '3'], ['H', '4'], ['H', '5'],
             ['H', '6'], ['H', '7'], ['H', '8'], ['H', '9'], ['H', '10'],
             ['H', 'J'], ['H', 'Q'], ['H', 'K'],
-            ['J', 'SC'], ['J', 'HD']]
+            ['J', 'B'], ['J', 'C']]
         self.cards = deque()
-        self.attack_card = ['2', 'A', 'J']
+        self.special_card = ['J', 'Q', 'K', '2', 'A', 'J']
         self.attack = 0
         self.top_card = ''
         self.turn = 1000
@@ -46,18 +45,20 @@ class Game:
     def giveCards(self, n):         # 카드 지급
         if not self.cards:
             return False
+        elif len(self.cards) < n:
+            return False
         np.random.shuffle(self.cards)
-        cards = list()
+        give = list()
         for i in range(n):
-            cards.append(self.card_list.pop())
-        return cards
+            give.append(self.cards.pop())
+        return give
 
     def find_turn(self):            # 플레이어 순서, 방향 파악
         return self.turn % 3, self.direction
 
     def action_able(self, my_cards):  # 가능한 행동 파악
         able = [0 for _ in range(9)]
-        if self.attack:
+        if self.attack > 0:
             for i in range(len(my_cards)):
                 if self.top_card[0] == 'J':
                     if my_cards[i][0] == 'J':
@@ -73,7 +74,7 @@ class Game:
                         able[6] = 1
                     elif my_cards[i][1] == 'A':
                         able[7] = 1
-                    elif my_cards[i][1] == 'J':
+                    elif my_cards[i][0] == 'J':
                         able[8] = 1
                 elif self.top_card[1] == 'A':
                     if my_cards[i][1] == 'A':
@@ -82,10 +83,39 @@ class Game:
                         able[8] = 1
         else:
             for i in range(len(my_cards)):
-                #if self.top_card[0] == 'J':
-                 #   if my_cards[i][0]
-                if self.top_card[0] == my_cards[i][0]:
-                    able[0] = 1
+                if my_cards[i][0] == 'J':
+                    able[8] = 1
+                if self.top_card[0] == 'J':
+                    if my_cards[i][1] == 'J':
+                        able[2] = 1
+                    elif my_cards[i][1] == 'Q':
+                        able[3] = 1
+                    elif my_cards[i][1] == 'K':
+                        able[4] = 1
+                    elif my_cards[i][1] == '3':
+                        able[5] = 1
+                    elif my_cards[i][1] == '2':
+                        able[6] = 1
+                    elif my_cards[i][1] == 'A':
+                        able[7] = 1
+                    else:
+                        able[0] = 1
+                elif self.top_card[0] == my_cards[i][0]:
+                    if my_cards[i][1] == 'J':
+                        able[2] = 1
+                    elif my_cards[i][1] == 'Q':
+                        able[3] = 1
+                    elif my_cards[i][1] == 'K':
+                        able[4] = 1
+                    elif my_cards[i][1] == '3':
+                        able[5] = 1
+                    elif my_cards[i][1] == '2':
+                        able[6] = 1
+                    elif my_cards[i][1] == 'A':
+                        able[7] = 1
+                    else:
+                        able[0] = 1
+
                 elif self.top_card[1] == my_cards[i][1]:
                     if my_cards[i][1] == 'J':
                         able[2] = 1
@@ -93,6 +123,12 @@ class Game:
                         able[3] = 1
                     elif my_cards[i][1] == 'K':
                         able[4] = 1
+                    elif my_cards[i][1] == '3':
+                        able[5] = 1
+                    elif my_cards[i][1] == '2':
+                        able[6] = 1
+                    elif my_cards[i][1] == 'A':
+                        able[7] = 1
                     else:
                         able[1] = 1
         if able == [0 for _ in range(9)]:
