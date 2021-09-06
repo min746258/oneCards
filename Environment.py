@@ -41,7 +41,7 @@ class Game:
         np.random.shuffle(self.card_list)
         self.top_card = self.cards.pop()
 
-    def giveCards(self, n):         # 카드 지급
+    def giveCards(self, n):         # 카드 지급 // 구현오 작업
         if not self.cards:
             return False
         elif len(self.cards) < n:
@@ -71,15 +71,19 @@ class Game:
                 elif self.top_card[1] == '2':
                     if my_cards[i][1] == '2':
                         able[6] = 1
-                    elif my_cards[i][1] == 'A':
+                    elif my_cards[i][1] == 'A' and my_cards[i][0] == self.top_card[0]:
                         able[7] = 1
-                    elif my_cards[i][0] == 'J':
+                    elif my_cards[i][0] == 'J' and my_cards[i][0] == self.top_card[0]:
                         able[8] = 1
+                    elif my_cards[i][1] == '3' and my_cards[i][0] == self.top_card[0]:
+                        able[5] = 1
                 elif self.top_card[1] == 'A':
                     if my_cards[i][1] == 'A':
                         able[7] = 1
                     elif my_cards[i][0] == 'J':
                         able[8] = 1
+                    elif my_cards[i][1] == '3' and my_cards[i][0] == self.top_card[0]:
+                        able[5] = 1
         else:
             for i in range(len(my_cards)):
                 if my_cards[i][0] == 'J':
