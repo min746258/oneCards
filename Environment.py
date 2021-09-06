@@ -39,8 +39,7 @@ class Game:
         self.direction = 1
         self.cards = deque(self.card_list)
         np.random.shuffle(self.card_list)
-        self.top_card = self.card_list.pop()
-        self.cards = deque(self.card_list)
+        self.top_card = self.cards.pop()
 
     def giveCards(self, n):         # 카드 지급
         if not self.cards:
