@@ -1,0 +1,2 @@
+내 아이디어가 들어간 부분 : 신경망 접근 부분 --> agent.append_sample / agent.update_target_model()
+(3명의 플레이어가 하나의 공통된 신경망으로 학습하게 하여 시간을 단축하였다)
