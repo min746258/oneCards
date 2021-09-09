@@ -42,7 +42,6 @@ class Agent:
 
         self.update_target_model()
 
-        self.writer = tf.summary.create_file_writer('summary/oneCard_DQN')
         self.loss = 0
 
     def update_target_model(self):                       # 타겟 모델 업데이트
@@ -93,9 +92,4 @@ class Agent:
         self.optimizer.apply_gradients(zip(grads, model_params))
 
         self.loss = loss
-
-    def draw_tensorboard(self, score, step, episode):
-        with self.writer.as_default():
-            tf.summary.scalar('Total Reward/Episode', score, step=episode)
-            tf.summary.scalar('Loss/Episode', self.loss, step=episode)
 

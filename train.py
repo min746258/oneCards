@@ -26,9 +26,9 @@ if __name__ == '__main__':
     P3_win = 0
     draw = 0
 
-    P1_win_log = list()                                                     # 게임 결과 플레이어별로 저장
-    P2_win_log = list()                                                     # 나중에 학습 결과에 참고하기 위함
-    P3_win_log = list()
+    P1_reward_log = list()                                                     # 게임 결과 플레이어별로 저장
+    P2_reward_log = list()                                                     # 나중에 학습 결과에 참고하기 위함
+    P3_reward_log = list()
     draw_log = list()
 
     for game in tqdm(range(episode_num)):
@@ -43,21 +43,22 @@ if __name__ == '__main__':
         P1_reward = 0
         P2_reward = 0
         P3_reward = 0
+        loss_log = list()
 
         for t in range(300):
-            # print('\n\n', env.turn)
-            # print('P1 : ', P1_cards)
-            # print('P2 : ', P2_cards)
-            # print('P3 : ', P3_cards)
-            # print('top card : ', env.top_card)
-            # print('attack : ', env.attack)
-            # print('deck : ', env.cards)
-            # print(len(P1_cards)+len(P2_cards)+len(P3_cards)+len(env.cards))
+            print('\n\n', env.turn)
+            print('P1 : ', P1_cards)
+            print('P2 : ', P2_cards)
+            print('P3 : ', P3_cards)
+            print('top card : ', env.top_card)
+            print('attack : ', env.attack)
+            print('deck : ', env.cards)
+            print(len(P1_cards)+len(P2_cards)+len(P3_cards)+len(env.cards))
 
             if env.turn % 3 == 1:                                           # P1 차례
-                # print('\nP1 turn')
+                print('\nP1 turn')
                 state = env.action_able(P1_cards)                           # 상태 정보 반환
-                # print('P1 state : ', state)
+                print('P1 state : ', state)
                 if not state:                                               # 행동을 취할 수 없는 상태라면
                     if env.attack:                                          # 공격받는 상태라면
                         if len(env.cards) >= env.attack:                    # 카드를 가져올 수 있다면 가져온다
@@ -85,7 +86,7 @@ if __name__ == '__main__':
                     else:
                         agent.append_sample(state, action, -1000, [0 for _ in range(9)], False)
 
-                # print('P1 action : ', action)
+                print('P1 action : ', action)
                 able = list()
                 if action == 0:                                             # 취한 행동 따라 낼 수 있는 카드 파악
                     for i in range(len(P1_cards)):
@@ -134,13 +135,13 @@ if __name__ == '__main__':
                         if P1_cards[i][0] == 'J':
                             able.append(P1_cards[i])
                     env.attack += 5
-                # print('P1 able : ', able)
+                print('P1 able : ', able)
                 if len(able) > 1:                                           # 낼 수 있는 카드가 여러 개라면 무작위로 선택
                     final_action = random.sample(able, 1)[0]
                 else:
                     final_action = able[0]
 
-                # print('1 final action : ', final_action)
+                print('1 final action : ', final_action)
                 env.step(final_action)                                      # 행동을 게임 환경에 반영
                 P1_cards.remove(final_action)                               # 낸 카드를 가지고 있는 카드 목록에서 제거
                 if next_state:
@@ -148,19 +149,21 @@ if __name__ == '__main__':
                 P1_reward = 0
                 if len(agent.memory) >= agent.train_start:
                     agent.train_model()                                     # 인공지능 모델 훈련
+                    loss_log.append(agent.loss)
                 next_state = state
                 if not P1_cards:                                            # 가진 카드 없다면 --> 승리!
                     done = True
                     P1_win += 1
-                    P1_reward += 100
-                    agent.append_sample(state, action, 100, next_state, done)
-                    agent.draw_tensorboard(P1_reward, step=t, episode=game)
+                    P1_reward += 200
+                    P2_reward -= 100
+                    P3_reward -= 100
+                    agent.append_sample(state, action, 200, next_state, done)
                     break
 
             elif env.turn % 3 == 2:             # P2(P1과 구조 동일하므로 주석 달지 않았음)
-                # print('\nP2 turn')
+                print('\nP2 turn')
                 state = env.action_able(P2_cards)
-                # print('P2 state : ', state)
+                print('P2 state : ', state)
                 if not state:
                     if env.attack:
                         if len(env.cards) >= env.attack:
@@ -186,7 +189,7 @@ if __name__ == '__main__':
                     else:
                         agent.append_sample(state, action, -1000, [0 for _ in range(9)], False)
 
-                # print('P2 action : ', action)
+                print('P2 action : ', action)
                 able = list()
 
                 if action == 0:
@@ -237,30 +240,32 @@ if __name__ == '__main__':
                         if P2_cards[i][0] == 'J':
                             able.append(P2_cards[i])
                     env.attack += 5
-                # print('P2 able : ', able)
+                print('P2 able : ', able)
                 if len(able) > 1:
                     final_action = random.sample(able, 1)[0]
                 else:
                     final_action = able[0]
                 P2_cards.remove(final_action)
-                # print('P2 final action : ', final_action)
+                print('P2 final action : ', final_action)
                 env.step(final_action)
                 if next_state:
                     agent.append_sample(state, action, P2_reward, next_state, done)
                 P2_reward = 0
                 if len(agent.memory) >= agent.train_start:
                     agent.train_model()
+                    loss_log.append(agent.loss)
                 next_state = state
                 if not P2_cards:
                     done = True
                     P2_win += 1
-                    P2_reward += 100
-                    agent.append_sample(state, action, 100, next_state, done)
-                    agent.draw_tensorboard(P2_reward, step=t, episode=game)
+                    P2_reward += 200
+                    P1_reward -= 100
+                    P3_reward -= 100
+                    agent.append_sample(state, action, 200, next_state, done)
             else:           # P3(P1과 구조 동일하므로 주석 달지 않았음)
-                # print('\nP3 turn')
+                print('\nP3 turn')
                 state = env.action_able(P3_cards)
-                # print('P3 state : ', state)
+                print('P3 state : ', state)
                 if not state:
                     if env.attack:
                         if len(env.cards) >= env.attack:
@@ -285,16 +290,16 @@ if __name__ == '__main__':
                         break
                     else:
                         agent.append_sample(state, action, -1000, [0 for _ in range(9)], False)
-                # print('P3 action : ', action)
+                print('P3 action : ', action)
                 able = list()
 
                 if action == 0:
                     for i in range(len(P3_cards)):
                         if P3_cards[i][0] == env.top_card[0] and P3_cards[i][1] not in env.special_card:
-                            # print('action0_normal')
+                            print('action0_normal')
                             able.append(P3_cards[i])
                         elif env.top_card[0] == 'J' and P3_cards[i][1] not in env.special_card:
-                            # print('action0_joker')
+                            print('action0_joker')
                             able.append(P3_cards[i])
                 elif action == 1:
                     for i in range(len(P3_cards)):
@@ -337,26 +342,28 @@ if __name__ == '__main__':
                         if P3_cards[i][0] == 'J':
                             able.append(P3_cards[i])
                     env.attack += 5
-                # print('P3 able : ', able)
+                print('P3 able : ', able)
                 if len(able) > 1:
                     final_action = random.sample(able, 1)[0]
                 else:
                     final_action = able[0]
                 P3_cards.remove(final_action)
-                # print('P3 final action : ', final_action)
+                print('P3 final action : ', final_action)
                 env.step(final_action)
                 if next_state:
                     agent.append_sample(state, action, P3_reward, next_state, done)
                 P3_reward = 0
                 if len(agent.memory) >= agent.train_start:
                     agent.train_model()
+                    loss_log.append(agent.loss)
                 next_state = state
                 if not P3_cards:
                     done = True
                     P3_win += 1
-                    P3_reward += 100
-                    agent.append_sample(state, action, 100, next_state, done)
-                    agent.draw_tensorboard(P3_reward, step=t, episode=game)
+                    P3_reward += 200
+                    P1_reward -= 100
+                    P2_reward -= 100
+                    agent.append_sample(state, action, 200, next_state, done)
 
             if done:                                    # 게임이 종료되었다면 --> 현재 신경망의 가중치를 타겟 신경망의 가중치에 복사
                 agent.update_target_model()
@@ -365,20 +372,19 @@ if __name__ == '__main__':
             env.turn += env.direction
 
         # print(P1_win, P2_win, P3_win, draw)
-        P1_win_log.append(P1_win)
-        P2_win_log.append(P2_win)
-        P3_win_log.append(P3_win)
-        draw_log.append(draw)
+        # P1_reward_log.append(P1_reward)
+        # P2_reward_log.append(P2_reward)
+        # P3_reward_log.append(P3_reward)
+        # draw_log.append(draw)
 
         # print('P1 win : {0:0.2f}% | P2 win : {0:0.2f}% | P3 win : {0:0.2f}% | draw :  {0:0.2f}%'
               # .format(P1_win/game*100, P2_win/game*100, P3_win/game*100, draw/game*100))
 
 print(P1_win, P2_win, P3_win, draw)                                 # 총 게임 결과 출력
-game_num = [i for i in range(1, episode_num+1)]
-plt.plot(game_num, P1_win_log, 'r')
-plt.plot(game_num, P2_win_log, 'g')
-plt.plot(game_num, P3_win_log, 'b')
-plt.plot(game_num, draw_log, 'y')
+game_num = [i for i in range(len(loss_log))]
+plt.plot(game_num, loss_log, 'r')
+# plt.plot(game_num, P2_reward_log, 'g')
+# plt.plot(game_num, P3_reward_log, 'b')
 plt.show()                                                          # 총 게임 결과 그래프로 출력
 agent.model.save_weights(".save_model/model", save_format="tf")     # 학습한 모델 저장
 print('done!')
