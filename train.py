@@ -152,7 +152,9 @@ if __name__ == '__main__':
                 if not P1_cards:                                            # 가진 카드 없다면 --> 승리!
                     done = True
                     P1_win += 1
+                    P1_reward += 100
                     agent.append_sample(state, action, 100, next_state, done)
+                    agent.draw_tensorboard(P1_reward, step=t, episode=game)
                     break
 
             elif env.turn % 3 == 2:             # P2(P1과 구조 동일하므로 주석 달지 않았음)
@@ -252,7 +254,9 @@ if __name__ == '__main__':
                 if not P2_cards:
                     done = True
                     P2_win += 1
+                    P2_reward += 100
                     agent.append_sample(state, action, 100, next_state, done)
+                    agent.draw_tensorboard(P2_reward, step=t, episode=game)
             else:           # P3(P1과 구조 동일하므로 주석 달지 않았음)
                 # print('\nP3 turn')
                 state = env.action_able(P3_cards)
@@ -350,7 +354,9 @@ if __name__ == '__main__':
                 if not P3_cards:
                     done = True
                     P3_win += 1
+                    P3_reward += 100
                     agent.append_sample(state, action, 100, next_state, done)
+                    agent.draw_tensorboard(P3_reward, step=t, episode=game)
 
             if done:                                    # 게임이 종료되었다면 --> 현재 신경망의 가중치를 타겟 신경망의 가중치에 복사
                 agent.update_target_model()
