@@ -1,0 +1,191 @@
+# 이상민 작업
+
+from Environment import Game
+from DQN_Player import *
+from tqdm import tqdm
+import matplotlib.pyplot as plt
+
+def turn(my_cards, my_reward, op1_reward, op2_reward, draw):
+    print('\nP1 turn')
+    state = env.action_able(my_cards)  # 상태 정보 반환
+    print('P1 state : ', state)
+    if not state:  # 행동을 취할 수 없는 상태라면
+        if env.attack:  # 공격받는 상태라면
+            if len(env.cards) >= env.attack:  # 카드를 가져올 수 있다면 가져온다
+                my_cards += env.giveCards(env.attack)
+            else:  # 카드를 가져올 수 없다면 무승부
+                draw += 1
+                break
+            op1_reward += env.attack + 1
+            op2_reward += env.attack + 1
+            env.attack = 0
+        else:  # 공격받는 상태가 아니라면
+            if env.cards:  # 카드를 가져올 수 있다면 가져온다
+                my_cards.append(env.giveCards(1)[0])
+            else:  # 카드를 가져올 수 없다면 무승부
+                draw += 1
+                break
+            op1_reward += 1
+            op2_reward += 1
+        env.turn += env.direction
+        continue
+    while True:
+        action = agent.get_action(state)  # 취할 행동을 정한다. 할 수 있는 행동이 반환될
+        if state[action] == 1:  # 때까지 반복하고, 보상이 -1000인 샘플을 추가함
+            break
+        else:
+            agent.append_sample(state, action, -1000, [0 for _ in range(9)], False)
+
+    print('P1 action : ', action)
+    able = list()
+    if action == 0:  # 취한 행동 따라 낼 수 있는 카드 파악
+        for i in range(len(my_cards)):
+            if my_cards[i][0] == env.top_card[0] and my_cards[i][1] not in env.special_card:
+                able.append(my_cards[i])
+            elif env.top_card[0] == 'J' and my_cards[i][1] not in env.special_card:
+                able.append(my_cards[i])
+    elif action == 1:
+        for i in range(len(my_cards)):
+            if my_cards[i][1] == env.top_card[1] and my_cards[i][1] not in env.special_card:
+                able.append(my_cards[i])
+    elif action == 2:
+        for i in range(len(my_cards)):
+            if my_cards[i][1] == 'J':
+                able.append(my_cards[i])
+        my_reward += 1
+        env.turn += env.direction
+    elif action == 3:
+        for i in range(len(my_cards)):
+            if my_cards[i][1] == 'Q':
+                able.append(my_cards[i])
+        env.direction *= -1
+    elif action == 4:
+        for i in range(len(my_cards)):
+            if my_cards[i][1] == 'K':
+                able.append(my_cards[i])
+        my_reward += 2
+        env.turn += 2
+    elif action == 5:
+        for i in range(len(my_cards)):
+            if my_cards[i][1] == '3':
+                able.append(my_cards[i])
+        env.attack = 0
+    elif action == 6:
+        for i in range(len(my_cards)):
+            if my_cards[i][1] == '2':
+                able.append(my_cards[i])
+        env.attack += 2
+    elif action == 7:
+        for i in range(len(my_cards)):
+            if my_cards[i][1] == 'A':
+                able.append(my_cards[i])
+        env.attack += 3
+    elif action == 8:
+        for i in range(len(my_cards)):
+            if my_cards[i][0] == 'J':
+                able.append(my_cards[i])
+        env.attack += 5
+    print('P1 able : ', able)
+    if len(able) > 1:  # 낼 수 있는 카드가 여러 개라면 무작위로 선택
+        final_action = random.sample(able, 1)[0]
+    else:
+        final_action = able[0]
+
+    print('1 final action : ', final_action)
+    env.step(final_action)  # 행동을 게임 환경에 반영
+    my_cards.remove(final_action)  # 낸 카드를 가지고 있는 카드 목록에서 제거
+    if next_state:
+        agent.append_sample(state, action, my_reward, next_state, done)  # 플래시 메모리에 샘플 추가
+    my_reward = 0
+    if len(agent.memory) >= agent.train_start:
+        agent.train_model()  # 인공지능 모델 훈련
+        loss_log.append(agent.loss)
+    next_state = state
+    if not my_cards:  # 가진 카드 없다면 --> 승리!
+        done = True
+        P1_win += 1
+        my_reward += 200
+        op1_reward -= 100
+        op2_reward -= 100
+        agent.append_sample(state, action, 200, next_state, done)
+        break
+
+if __name__ == '__main__':
+
+    env = Game()                                                            # 게임 모듈 호출
+    state_size = env.state_size
+    action_size = env.action_size
+
+    agent = Agent(state_size, action_size)                                  # 게임 플레이어 모듈 호출
+
+    scores, episodes = list(), list()
+    score_avg = 0
+
+    episode_num = int(input('how many games? : '))                          # 학습할 에피소드 횟수 입력
+
+    startingCards_num = int(input('How many cards to start with? : '))      # 시작할 카드 수 입력
+
+    P1_win = 0                                                              # 승수 초기화
+    P2_win = 0
+    P3_win = 0
+    draw = 0
+
+    P1_reward_log = list()                                                     # 게임 결과 플레이어별로 저장
+    P2_reward_log = list()                                                     # 나중에 학습 결과에 참고하기 위함
+    P3_reward_log = list()
+    draw_log = list()
+
+    for game in tqdm(range(episode_num)):
+        env.resetGame()
+        P1_cards = env.giveCards(startingCards_num)                         # 처음에 카드 지급
+        P2_cards = env.giveCards(startingCards_num)
+        P3_cards = env.giveCards(startingCards_num)
+
+        done = False                                                        # 상태 초기화
+        winner = False
+        next_state = False
+        P1_reward = 0
+        P2_reward = 0
+        P3_reward = 0
+        loss_log = list()
+
+        for t in range(300):
+            print('\n\n', env.turn)
+            print('P1 : ', P1_cards)
+            print('P2 : ', P2_cards)
+            print('P3 : ', P3_cards)
+            print('top card : ', env.top_card)
+            print('attack : ', env.attack)
+            print('deck : ', env.cards)
+            print(len(P1_cards)+len(P2_cards)+len(P3_cards)+len(env.cards))
+
+            if env.turn % 3 == 1:                                           # P1 차례
+
+            elif env.turn % 3 == 2:             # P2(P1과 구조 동일하므로 주석 달지 않았음)
+
+            else:           # P3(P1과 구조 동일하므로 주석 달지 않았음)
+
+
+            if done:                                    # 게임이 종료되었다면 --> 현재 신경망의 가중치를 타겟 신경망의 가중치에 복사
+                agent.update_target_model()
+                break
+
+            env.turn += env.direction
+
+        # print(P1_win, P2_win, P3_win, draw)
+        # P1_reward_log.append(P1_reward)
+        # P2_reward_log.append(P2_reward)
+        # P3_reward_log.append(P3_reward)
+        # draw_log.append(draw)
+
+        # print('P1 win : {0:0.2f}% | P2 win : {0:0.2f}% | P3 win : {0:0.2f}% | draw :  {0:0.2f}%'
+              # .format(P1_win/game*100, P2_win/game*100, P3_win/game*100, draw/game*100))
+
+print(P1_win, P2_win, P3_win, draw)                                 # 총 게임 결과 출력
+game_num = [i for i in range(len(loss_log))]
+plt.plot(game_num, loss_log, 'r')
+# plt.plot(game_num, P2_reward_log, 'g')
+# plt.plot(game_num, P3_reward_log, 'b')
+plt.show()                                                          # 총 게임 결과 그래프로 출력
+agent.model.save_weights(".save_model/model", save_format="tf")     # 학습한 모델 저장
+print('done!')
