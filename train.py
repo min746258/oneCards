@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 if __name__ == '__main__':
 
     env = Game()                                                            # 게임 모듈 호출
-    state_size = env.state_size-
+    state_size = env.state_size
     action_size = env.action_size
 
     agent = Agent(state_size, action_size)                                  # 게임 플레이어 모듈 호출
