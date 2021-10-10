@@ -8,12 +8,13 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.initializers import RandomUniform
 
+
 class DQN(tf.keras.Model):              # 모델 정의
     # 신경망 2개로 구성됨!!! (문양 결정/카드 종류 결정)
-    def __init__(self, action_size):
+    def __init__(self, action_size, depth):             # depth = 6(모양 결정) or 9(종류 결정)
         super(DQN, self).__init__()
-        self.fc1 = Dense(9, activation='relu')                                                  # 입력층?
-        self.fc2 = Dense(9, activation='relu')                                                  # 은닉층1
+        self.fc1 = Dense(depth, activation='relu')                                                  # 입력층?
+        self.fc2 = Dense(depth, activation='relu')                                                  # 은닉층1
         self.fc_out = Dense(action_size, kernel_initializer=RandomUniform(-1e-3, 1e-3))         # 출력층(가중치 초기화)
 
     def call(self, x):                  # 큐함수 반환?
@@ -21,6 +22,7 @@ class DQN(tf.keras.Model):              # 모델 정의
         x = self.fc2(x)
         q = self.fc_out(x)
         return q
+
 
 class Agent:
     def __init__(self, state_size, action_size):

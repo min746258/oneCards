@@ -5,9 +5,10 @@ import numpy as np
 # 문양은 스페이드, 하트 등을 의미함
 # 모양은 J,Q,K 등을 의미함
 
+
 class Game:
     def __init__(self):
-        self.card_list = [          #Diamond, Spade, Clover, Heart, Joker=0
+        self.card_list = [          # Diamond, Spade, Clover, Heart, Joker=0
             ['D', 'A'], ['D', '2'], ['D', '3'], ['D', '4'], ['D', '5'],
             ['D', '6'], ['D', '7'], ['D', '8'], ['D', '9'], ['D', '10'],
             ['D', 'J'], ['D', 'Q'], ['D', 'K'],
@@ -28,7 +29,7 @@ class Game:
         self.shape = '0'             # D, S, C, H, 0(조커/Default)
         self.turn = 1000
         self.direction = 1
-        # self.state = [0 for _ in range(8)]
+        self.state = [0 for _ in range(9)]
         self.state_size = len(self.state)
         self.actions = self.state
         self.action_size = len(self.actions)
@@ -59,91 +60,99 @@ class Game:
         return self.turn % 3, self.direction
 
     def action_able(self, my_cards):  # 가능한 행동 파악(낼 수 있는 카드 개수 의미함)
-        able = [0 for _ in range(8)]            # [일반카드, J(특수), Q(특수), K(특수), 3(방어), 2(공격), A(공격), 조커(공격)]
+        able = [0 for _ in range(9)]            # [일반카드, 7(특수), J(특수), Q(특수), K(특수), 3(방어), 2(공격), A(공격), 조커(공격)]
         if self.attack > 0:
             for i in range(len(my_cards)):
                 if self.shape == '0':
                     if my_cards[i][0] == '0':
-                        able[7] += 1
+                        able[8] += 1
                     elif my_cards[i][1] == '3':
-                        able[4] += 1
+                        able[5] += 1
                 elif self.top_card[1] == '2':
                     if my_cards[i][1] == '2':
-                        able[5] += 1
-                    elif my_cards[i][1] == 'A' and my_cards[i][0] == self.shape:
                         able[6] += 1
-                    elif my_cards[i][0] == '0':
+                    elif my_cards[i][1] == 'A' and my_cards[i][0] == self.shape:
                         able[7] += 1
+                    elif my_cards[i][0] == '0':
+                        able[8] += 1
                     elif my_cards[i][1] == '3' and my_cards[i][0] == self.shape:
-                        able[4] += 1
+                        able[5] += 1
                 elif self.top_card[1] == 'A':
                     if my_cards[i][1] == 'A':
-                        able[6] += 1
-                    elif my_cards[i][0] == '0':
                         able[7] += 1
+                    elif my_cards[i][0] == '0':
+                        able[8] += 1
                     elif my_cards[i][1] == '3' and my_cards[i][0] == self.shape:
-                        able[4] += 1
+                        able[5] += 1
         else:
             for i in range(len(my_cards)):
                 if my_cards[i][0] == '0':
-                    able[7] += 1
+                    able[8] += 1
                 if self.shape == '0':           # 조커 낸 후
-                    if my_cards[i][1] == 'J':
+                    if my_cards[i][1] == '7':
                         able[1] += 1
-                    elif my_cards[i][1] == 'Q':
+                    elif my_cards[i][1] == 'J':
                         able[2] += 1
-                    elif my_cards[i][1] == 'K':
+                    elif my_cards[i][1] == 'Q':
                         able[3] += 1
-                    elif my_cards[i][1] == '3':
+                    elif my_cards[i][1] == 'K':
                         able[4] += 1
-                    elif my_cards[i][1] == '2':
+                    elif my_cards[i][1] == '3':
                         able[5] += 1
-                    elif my_cards[i][1] == 'A':
+                    elif my_cards[i][1] == '2':
                         able[6] += 1
+                    elif my_cards[i][1] == 'A':
+                        able[7] += 1
                     else:
                         able[0] += 1
                 elif self.shape == my_cards[i][0]:      # 문양 같은 경우
-                    if my_cards[i][1] == 'J':
+                    if my_cards[i][1] == '7':
                         able[1] += 1
-                    elif my_cards[i][1] == 'Q':
+                    elif my_cards[i][1] == 'J':
                         able[2] += 1
-                    elif my_cards[i][1] == 'K':
+                    elif my_cards[i][1] == 'Q':
                         able[3] += 1
-                    elif my_cards[i][1] == '3':
+                    elif my_cards[i][1] == 'K':
                         able[4] += 1
-                    elif my_cards[i][1] == '2':
+                    elif my_cards[i][1] == '3':
                         able[5] += 1
-                    elif my_cards[i][1] == 'A':
+                    elif my_cards[i][1] == '2':
                         able[6] += 1
+                    elif my_cards[i][1] == 'A':
+                        able[7] += 1
                     else:
                         able[0] += 1
 
                 elif self.top_card[1] == my_cards[i][1]:        # 종류 같은 경우
-                    if my_cards[i][1] == 'J':
+                    if my_cards[i][1] == '7':
                         able[1] += 1
-                    elif my_cards[i][1] == 'Q':
+                    elif my_cards[i][1] == 'J':
                         able[2] += 1
-                    elif my_cards[i][1] == 'K':
+                    elif my_cards[i][1] == 'Q':
                         able[3] += 1
-                    elif my_cards[i][1] == '3':
+                    elif my_cards[i][1] == 'K':
                         able[4] += 1
-                    elif my_cards[i][1] == '2':
+                    elif my_cards[i][1] == '3':
                         able[5] += 1
-                    elif my_cards[i][1] == 'A':
+                    elif my_cards[i][1] == '2':
                         able[6] += 1
+                    elif my_cards[i][1] == 'A':
+                        able[7] += 1
                     else:
                         able[0] += 1
         if able == [0 for _ in range(8)]:
             return False
         return able
 
+    def step(self, action):         # 행동 반영
+        self.cards.append(self.top_card)
+        self.top_card = action
+
+
+'''
     def shape_able(self, my_cards, able):
         able.pop()
         for n in able:
             if n > 1:
                 for i in range(len(my_cards)):
-
-
-    def step(self, action):         # 행동 반영
-        self.cards.append(self.top_card)
-        self.top_card = action
+'''
