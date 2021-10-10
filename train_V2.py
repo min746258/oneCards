@@ -1,11 +1,13 @@
-# 이상민 작업
+# train.py 에서 플레이어별로 중첩되는 긴 부분을 turn 함수로 요약하는 과정
 
 from Environment import Game
 from DQN_Player import *
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-def turn(my_cards, my_reward, op1_reward, op2_reward, draw):
+def turn(my_cards, next_state, draw, my_win):
+    my_reward, op1_reward, op2_reward = 0,0,0
+    done = False
     print('\nP1 turn')
     state = env.action_able(my_cards)  # 상태 정보 반환
     print('P1 state : ', state)
@@ -103,12 +105,15 @@ def turn(my_cards, my_reward, op1_reward, op2_reward, draw):
     next_state = state
     if not my_cards:  # 가진 카드 없다면 --> 승리!
         done = True
-        P1_win += 1
+        my_win += 1
         my_reward += 200
         op1_reward -= 100
         op2_reward -= 100
         agent.append_sample(state, action, 200, next_state, done)
         break
+
+    return my_cards, next_state, draw, my_win, done, \
+           my_reward, op1_reward, op2_reward
 
 if __name__ == '__main__':
 
@@ -148,6 +153,7 @@ if __name__ == '__main__':
         P2_reward = 0
         P3_reward = 0
         loss_log = list()
+        playdata = list()
 
         for t in range(300):
             print('\n\n', env.turn)
@@ -160,11 +166,11 @@ if __name__ == '__main__':
             print(len(P1_cards)+len(P2_cards)+len(P3_cards)+len(env.cards))
 
             if env.turn % 3 == 1:                                           # P1 차례
-
+                playdata = turn(P1_cards, next_state, draw, P1_win)
             elif env.turn % 3 == 2:             # P2(P1과 구조 동일하므로 주석 달지 않았음)
-
+                pass
             else:           # P3(P1과 구조 동일하므로 주석 달지 않았음)
-
+                pass
 
             if done:                                    # 게임이 종료되었다면 --> 현재 신경망의 가중치를 타겟 신경망의 가중치에 복사
                 agent.update_target_model()
