@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
             if env.turn % 3 == 1:                                           # P1 차례
                 print('\nP1 turn')
-                state = env.action_able(P1_cards)                           # 상태 정보 반환
+                state = env.action_able(P1_cards, env.top_card)                           # 상태 정보 반환
                 print('P1 state : ', state)
                 if not state:                                               # 행동을 취할 수 없는 상태라면
                     if env.attack:                                          # 공격받는 상태라면
@@ -161,7 +161,7 @@ if __name__ == '__main__':
 
             elif env.turn % 3 == 2:             # P2(P1과 구조 동일하므로 주석 달지 않았음)
                 print('\nP2 turn')
-                state = env.action_able(P2_cards)
+                state = env.action_able(P2_cards, env.top_card)
                 print('P2 state : ', state)
                 if not state:
                     if env.attack:
@@ -263,7 +263,7 @@ if __name__ == '__main__':
                     agent.append_sample(state, action, 200, next_state, done)
             else:           # P3(P1과 구조 동일하므로 주석 달지 않았음)
                 print('\nP3 turn')
-                state = env.action_able(P3_cards)
+                state = env.action_able(P3_cards, env.top_card)
                 print('P3 state : ', state)
                 if not state:
                     if env.attack:

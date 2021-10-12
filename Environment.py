@@ -55,7 +55,7 @@ class Game:
     def find_turn(self):            # 플레이어 순서, 방향 파악
         return self.turn % 3, self.direction
 
-    def action_able(self, my_cards):  # 가능한 행동 파악
+    def action_able(self, my_cards, top_card):  # 가능한 행동 파악
         able = [0 for _ in range(9)]         # [같은 숫자, 같은 문양,  2,3,A,J,K,Q,조커] (?)
         if self.attack > 0:
             for i in range(len(my_cards)):
@@ -68,7 +68,7 @@ class Game:
                         able[6] = 1
                     if my_cards[i][1] == 'A':
                         able[7] = 1'''
-                elif self.top_card[1] == '2':
+                elif top_card[1] == '2':
                     if my_cards[i][1] == '2':
                         able[6] = 1
                     elif my_cards[i][1] == 'A' and my_cards[i][0] == self.top_card[0]:
@@ -77,7 +77,7 @@ class Game:
                         able[8] = 1
                     elif my_cards[i][1] == '3' and my_cards[i][0] == self.top_card[0]:
                         able[5] = 1
-                elif self.top_card[1] == 'A':
+                elif top_card[1] == 'A':
                     if my_cards[i][1] == 'A':
                         able[7] = 1
                     elif my_cards[i][0] == 'J':
@@ -88,7 +88,7 @@ class Game:
             for i in range(len(my_cards)):
                 if my_cards[i][0] == 'J':
                     able[8] = 1
-                if self.top_card[0] == 'J':
+                if top_card[0] == 'J':
                     if my_cards[i][1] == 'J':
                         able[2] = 1
                     elif my_cards[i][1] == 'Q':
@@ -103,7 +103,7 @@ class Game:
                         able[7] = 1
                     else:
                         able[0] = 1
-                elif self.top_card[0] == my_cards[i][0]:
+                elif top_card[0] == my_cards[i][0]:
                     if my_cards[i][1] == 'J':
                         able[2] = 1
                     elif my_cards[i][1] == 'Q':
@@ -119,7 +119,7 @@ class Game:
                     else:
                         able[0] = 1
 
-                elif self.top_card[1] == my_cards[i][1]:
+                elif top_card[1] == my_cards[i][1]:
                     if my_cards[i][1] == 'J':
                         able[2] = 1
                     elif my_cards[i][1] == 'Q':

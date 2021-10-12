@@ -91,8 +91,7 @@ for t in range(300):
                 env.attack += 5
             final_action = random.sample(able)
             env.step(final_action)
-        else:
-            if env.attack:
+        else:            if env.attack:
                 P3_cards += env.giveCards(env.attack)
                 env.attack = 0
             else:
@@ -100,6 +99,7 @@ for t in range(300):
         if not P3.cards:
             winner = 3
             done = True
+
 
     if done:
         if winner == 1:
