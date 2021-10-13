@@ -1,7 +1,6 @@
 import DQN_Player
 import random
 from Environment import Game
-from keras.models import load_model
 
 def get_card():
     data = input().split()
@@ -9,42 +8,49 @@ def get_card():
 
 # P1 : AI
 # P2 : Human
-# P3 : Human
+# P0 : Human
+
+
 print('starting game!\nP1 is AI Player.')
 
 startingCards_num = 5
 
 env = Game()
 
-model = load_model('model')
+
 P1 = DQN_Player.Agent(env.state_size, env.action_size)
 
 print('please take 5 cards each')
 P1_cards = [get_card() for _ in range(startingCards_num)]
-P2_cards = [get_card() for _ in range(startingCards_num)]
-P3_cards = [get_card() for _ in range(startingCards_num)]
 done = False
 winner = False
 
-top_card = get_card()
+env.top_card = get_card()
 
 for t in range(300):
     turn, direction = env.find_turn()
     action = False
-
     if turn == 1:               # AI turn
         print("P{} turn".format(turn))
-        state = env.action_able(P1_cards, top_card)
-        action = P1.get_action(state)
+        print(env.top_card)
+        state = env.action_able(P1_cards, env.top_card)
+        while True:
+            if state == [0 for i in range(len(state))]:
+                action = 999
+                break
+            action = P1.get_action(state)
+            if state[action] > 0:
+                break
         able = list()
-        if action:
+        if action != 999:
+            print(action)
             if action == 0:
                 for i in range(len(P1_cards)):
                     if P1_cards[i][0] == env.top_card[0]:
                         able.append(P1_cards[i])
             elif action == 1:
                 for i in range(len(P1_cards)):
-                    if P3_cards[i][1] == env.top_card[1]:
+                    if P1_cards[i][1] == env.top_card[1]:
                         able.append(P1_cards[i])
             elif action == 2:
                 for i in range(len(P1_cards)):
@@ -81,16 +87,31 @@ for t in range(300):
                     if P1_cards[i][0] == 'J':
                         able.append(P1_cards[i])
                 env.attack += 5
-            final_action = random.sample(able)
-            env.step(final_action)
+            final_action = random.sample(able, len(able))
+            print(final_action)
+            env.top_card = final_action[0]
         else:
             if env.attack:
-                P1_cards.extend(env.giveCards(env.attack))
+                P1_cards.extend([get_card() for _ in range(env.attack)])
                 env.attack = 0
             else:
-                P1_cards.append(env.giveCards(1)[0])
+                P1_cards.append(get_card())
         if not P1_cards:
-            winner = 3
-            done = True
+            break
     else:
+        print("P{} turn".format(turn))
+        action = get_card()
+        print(env.top_card)
+        if action == '0':
+            print('passing')
+            pass
+        else:
+            print('not passing')
+            env.top_card = action
+
+    env.turn += env.direction
+
+print('game ended!!!')
+
+
 

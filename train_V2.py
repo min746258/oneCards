@@ -3,7 +3,7 @@
 from Environment import Game
 from DQN_Player import *
 from tqdm import tqdm
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
 

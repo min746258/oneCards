@@ -37,6 +37,7 @@ class Agent:
         self.memory = deque(maxlen=2000)
 
         self.model = DQN(action_size)
+        self.model.load_weights("./.save_model/model_001").expect_partial()
         self.target_model = DQN(action_size)
         self.optimizer = Adam(lr=self.learning_rate)
 
